@@ -1,0 +1,29 @@
+services:
+  unittcms:
+    image: fridon/unittcms:latest
+    container_name: unittcms
+    restart: unless-stopped
+    ports:
+      - '8000:8000'
+    environment:
+      - PORT=8000
+      - NODE_ENV=production
+      - SECRET_KEY=${SECRET_KEY:-your_secret_key_here}
+      - IS_DEMO=${IS_DEMO:-false}
+      - FRONTEND_ORIGIN=${FRONTEND_ORIGIN:-http://localhost:8000}
+    volumes:
+      - db-data:/app/backend/database
+      - uploads:/app/backend/public/uploads
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  db-data:
+    driver: local
+  uploads:
+    driver: local
+
