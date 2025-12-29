@@ -55,10 +55,8 @@ COPY --from=frontend-builder /app/frontend/public ./public
 # Copy Next.js module for the server
 COPY --from=deps /app/frontend/node_modules/next ./node_modules/next
 
-# Install backend dependencies directly in the container to ensure native modules are built correctly
-WORKDIR /app/backend
-COPY backend/package.json backend/package-lock.json* ./
-RUN npm ci
+# Copy backend dependencies from deps stage (быстрее, чем переустановка)
+COPY --from=deps /app/backend/node_modules ./backend/node_modules
 WORKDIR /app
 
 # Copy custom entrypoint.js that combines frontend and backend
